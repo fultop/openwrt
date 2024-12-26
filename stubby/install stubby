@@ -29,53 +29,73 @@ nslookup openwrt.org localhost
 To check your DNS provider, you can use:
 
 Cloudflare Test
+https://one.one.one.one/help/
 AdGuard Test
+https://adguard.com/en/test.html
 NextDNS Test
+https://test.nextdns.io/
 Mullvad Test
+https://mullvad.net/en/check
 Quad9 Test
+https://on.quad9.net/
 OpenDNS Test
+https://welcome.opendns.com/
 Cloudflare Browser Check
+https://www.cloudflare.com/ssl/encrypted-sni/
 DNS Leak Test and DNSSEC Test:
 
 DNS Leak Test #1
+https://dnsleaktest.com/
 DNS Leak Test #2
+https://dnscheck.tools/
 DNSSEC Test #1
+http://dnssec-or-not.com/
 DNSSEC Test #2
+https://wander.science/projects/dns/dnssec-resolver-test/
 Alternative test via CLI: * check connection to Quad9 DNS (it require to use Quad9 DNS servers):
 
 dig +short txt proto.on.quad9.net.
 # should print: doh. or dot.
-* check connection to NextDNS (it require to use NextDNS DNS servers):
-
-curl -SL https://test.nextdns.io/
-{
-        "status": "ok",
-        "protocol": "DOT",
-        "profile": "SOMEPROFILE",
-        "client": "80.XXX.XXX.XXX",
-        "srcIP": "80.XXX.XXX.XXX",
-        "destIP": "XX.XX.28.0",
-        "anycast": true,
-        "server": "zepto-ber-1",
-        "clientName": "unknown-dot"
-}
-Alternate Testing sites
-https://www.cloudflare.com/ssl/encrypted-sni/
-https://1.1.1.1/help
-Troubleshooting
-Collect and analyze the following information.
-
-# Restart services
-service log restart; service dnsmasq restart; service stubby restart
- 
-# Log and status
-logread -e dnsmasq; netstat -l -n -p | grep -e dnsmasq
-logread -e stubby; netstat -l -n -p | grep -e stubby
- 
-# Runtime configuration
-pgrep -f -a dnsmasq; pgrep -f -a stubby
-head -v -n -0 /etc/resolv.* /tmp/resolv.* /tmp/resolv.*/*
- 
-# Persistent configuration
+-------------------------------------------------------------
+uci commit stubby
+service stubby restart
+vi /etc/config/stubby
+# and then set option manual '1' 
 uci show dhcp
 uci show stubby
+---------------------------------------------------------------
+
+
+
+#Products
+1.1.1.1 (DNS Resolver)
+IP addresses
+IP addresses
+Consider the tables below to know which IPv4 or IPv6 addresses are used by the different Cloudflare DNS resolver offerings.
+
+For detailed guidance refer to Set up.
+
+1.1.1.1
+1.1.1.1 is Cloudflare’s public DNS resolver. It offers a fast and private way to browse the Internet.
+
+IPv4	IPv6
+1.1.1.1
+1.0.0.1	2606:4700:4700::1111
+2606:4700:4700::1001
+Refer to Encryption to learn how to use 1.1.1.1 in an encrypted way.
+
+1.1.1.1 for Families
+1.1.1.1 for Families categorizes destinations on the Internet based on the potential threat they pose regarding malware, phishing, or other types of security risks.
+
+For more information, refer to 1.1.1.1 for Families set up.
+
+Block malware
+IPv4	IPv6
+1.1.1.2
+1.0.0.2	2606:4700:4700::1112
+2606:4700:4700::1002
+Block malware and adult content
+IPv4	IPv6
+1.1.1.3
+1.0.0.3	2606:4700:4700::1113
+2606:4700:4700::1003
