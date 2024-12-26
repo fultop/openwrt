@@ -1,0 +1,58 @@
+Command-line instructions
+1.) Install the required packages:
+
+opkg update
+opkg install stubby
+2.) Enable DNS encryption:
+
+service dnsmasq stop
+uci set dhcp.@dnsmasq[0].noresolv="1"
+uci -q delete dhcp.@dnsmasq[0].server
+uci -q get stubby.global.listen_address \
+| sed -e "s/\s/\n/g;s/@/#/g" \
+| while read -r STUBBY_SERV
+do uci add_list dhcp.@dnsmasq[0].server="${STUBBY_SERV}"
+done
+3.) Disable local use of dnsmasq/stubby: It is not possible for Stubby to be UP during boot or just right after boot, without additional configuration, because of the race condition with SYSNTPd service. race_conditions_with_sysntpd
+
+uci set dhcp.@dnsmasq[0].localuse="0"
+4.) Commit changes:
+
+uci commit dhcp
+service dnsmasq start
+LAN clients should use Dnsmasq as a primary resolver. Dnsmasq forwards DNS queries to Stubby which encrypts DNS traffic.
+
+Testing
+Verify domain name resolution with nslookup:
+
+nslookup openwrt.org localhost
+To check your DNS provider, you can use:
+
+Cloudflare Test
+https://one.one.one.one/help/
+AdGuard Test
+https://adguard.com/en/test.html
+NextDNS Test
+https://test.nextdns.io/
+Mullvad Test
+https://mullvad.net/en/check
+Quad9 Test
+https://on.quad9.net/
+OpenDNS Test
+https://welcome.opendns.com/
+Cloudflare Browser Check
+https://www.cloudflare.com/ssl/encrypted-sni/
+DNS Leak Test and DNSSEC Test:
+
+DNS Leak Test #1
+https://dnsleaktest.com/
+DNS Leak Test #2
+https://dnscheck.tools/
+DNSSEC Test #1
+http://dnssec-or-not.com/
+DNSSEC Test #2
+https://wander.science/projects/dns/dnssec-resolver-test/
+Alternative test via CLI: * check connection to Quad9 DNS (it require to use Quad9 DNS servers):
+
+dig +short txt proto.on.quad9.net.
+# should print: doh. or dot.
